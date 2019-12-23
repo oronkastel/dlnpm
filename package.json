@@ -1,13 +1,15 @@
 {
     "name": "dlnpm",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "Download npm packages as .tgz files in order to be used in private npm repository",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "start": "nodemon --watch **/*.ts --exec ts-node src/index.ts",
+        "build": "tsc -p .",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "prepublish": "tsc"
+        "prepublish": "tsc -p .",
+        "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
     },
     "keywords": [
         "npm",
@@ -18,15 +20,32 @@
     "author": "Oron Kastel-Mizrahi <oron.kastel@gmail.com>",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "^22.1.4",
-        "@types/node": "^9.4.6",
-        "jest": "^22.4.2",
-        "ts-jest": "^22.4.1",
-        "typescript": "^2.7.2"
+        "@types/jest": "22.2.3",
+        "@types/node": "12.12.2",
+        "jest": "24.9.0",
+        "nodemon": "2.0.2",
+        "ts-jest": "24.2.0",
+        "ts-node": "8.5.4",
+        "typescript": "3.4.3"
     },
-    "dependencies": {},
+    "dependencies": {
+        "clear": "0.1.0",
+        "figlet": "1.2.4",
+        "chalk": "3.0.0",
+        "commander": "4.0.1",
+        "path": "0.12.7",
+        "node-fetch": "2.6.0"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/oronkastel/dlnpm.git"
-    }
+    },
+    "bin": {
+        "dlnpm": "lib/index.js"
+    },
+    "configurations": [
+        {
+            "type": "node"
+        }
+    ]
 }

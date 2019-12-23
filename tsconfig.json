@@ -3,15 +3,23 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "lib": ["es2017", "es7", "es6", "dom"],
+    "lib": ["es2017", "es7", "es6", "dom", ],
     "declaration": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"],
+    "typeRoots": [ "../node_modules/@types" ],
+    "resolveJsonModule": true,
+    "noImplicitAny": false
+  },
+  "typingOptions": {
+    "enableAutoDiscovery": true
   },
   "exclude": [
     "node_modules",
     "dist",
+    "lib",
     "test"
   ]
 }
