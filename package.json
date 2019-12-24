@@ -20,21 +20,22 @@
     "author": "Oron Kastel-Mizrahi <oron.kastel@gmail.com>",
     "license": "MIT",
     "devDependencies": {
-        "@types/jest": "22.2.3",
-        "@types/node": "12.12.2",
-        "jest": "24.9.0",
-        "nodemon": "2.0.2",
-        "ts-jest": "24.2.0",
-        "ts-node": "8.5.4",
-        "typescript": "3.4.3"
+        "@types/jest": "^22.2.3",
+        "@types/node": "^12.12.2",
+        "jest": "^24.9.0",
+        "nodemon": "^2.0.2",
+        "ts-jest": "^24.2.0",
+        "ts-node": "^8.5.4",
+        "typescript": "^3.4.3"
     },
     "dependencies": {
-        "clear": "0.1.0",
-        "figlet": "1.2.4",
-        "chalk": "3.0.0",
-        "commander": "4.0.1",
-        "path": "0.12.7",
-        "node-fetch": "2.6.0"
+        "chalk": "^3.0.0",
+        "clear": "^0.1.0",
+        "commander": "^4.0.1",
+        "figlet": "^1.2.4",
+        "node-fetch": "^2.6.0",
+        "path": "^0.12.7",
+        "semver": "^7.1.1"
     },
     "repository": {
         "type": "git",

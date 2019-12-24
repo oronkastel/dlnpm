@@ -9,7 +9,7 @@
     "strict": true,
     "esModuleInterop": true,
     "types": ["node"],
-    "typeRoots": [ "../node_modules/@types" ],
+    "typeRoots": [ "node_modules/@types" ],
     "resolveJsonModule": true,
     "noImplicitAny": false
   },
