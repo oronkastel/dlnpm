@@ -136,7 +136,26 @@ function handlePackageJson(_packageVersion: string, json: any) {
     if (packageVersion === LATEST) {
         packageVersion = json['dist-tags'].latest;
     }
+
+    //handle local file version
+    //see Local Paths under http://npm.github.io/using-pkgs-docs/package-json/types-of-dependencies.html
+    if(packageVersion.startsWith('file:') || packageVersion.startsWith('../') || packageVersion.startsWith('~/') || packageVersion.startsWith('./') || packageVersion.startsWith('/')) {
+        //don't support local directory dependcy. to be on the safe side, download latest
+        packageVersion = json['dist-tags'].latest;
+    }
+
+    //handle git dependency
+    if(packageVersion.startsWith('git:') || packageVersion.startsWith('git+') || packageVersion.startsWith('github:') || packageVersion.startsWith('github+') || packageVersion.startsWith('https://github') || packageVersion.startsWith('http://github')) {
+        //TODO: add support to git dependecy. for now, download latest
+        console.log(chalk.yellow("Warn: github dependencies from github not supported yet. (" + packageVersion + "). Using latest version from npm instead."));
+        packageVersion = json['dist-tags'].latest;
+    }
+
     var versionInfo = parseVersion(json, packageVersion);
+    if(versionInfo===undefined)
+    {
+        console.log(chalk.red("wasn't able to parse package version %s"),packageVersion)
+    }
     var versionSymbol = json.name + "@" + versionInfo.version;
     if (handledPackages[versionSymbol] === undefined) { //if we already processed this package@version
         if (program.log) {
@@ -145,13 +164,19 @@ function handlePackageJson(_packageVersion: string, json: any) {
 
 
         handledPackages[versionSymbol] = versionSymbol;
-        DownloadPack(json._id);
+        DownloadPack(versionInfo.dist.tarball);
 
         //Handle package depedencies
         HandleDependencies(versionInfo.dependencies);
 
         //Handle package devDependencies
         HandleDependencies(versionInfo.devDependencies);
+
+        //Handle package optionalDependencies
+        HandleDependencies(versionInfo.optionalDependencies);
+
+        //Handle package peerDependencies
+        HandleDependencies(versionInfo.peerDependencies);
 
         
     }
@@ -184,7 +209,9 @@ function parseVersion(json: any, packageVersion: string) {
 
     let parsedVersion = semver.maxSatisfying(allVersions,packageVersion);
     if(parsedVersion===undefined) {
-        console.log(chalk.red(packageVersion + " IS BAD"));
+        parsedVersion = json['dist-tags'].latest; //use latest in that case
+        console.log(chalk.yellow("Warn: " + packageVersion + " semantic versioning error. Using latest version instead (" + json.name + "@" + parsedVersion + ")"));
+
     }
     return json.versions[parsedVersion];
 }
