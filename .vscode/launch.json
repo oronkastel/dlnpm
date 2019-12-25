@@ -7,7 +7,7 @@
         "name": "Build Program",
         "program": "${workspaceFolder}\\lib\\index.js",
         "args": [ "-p","debug"],
-        "preLaunchTask": "npm: build",
+        //"preLaunchTask": "npm: build",
         "sourceMaps": true,
         "smartStep": true,
         "outFiles": ["${workspaceFolder}/lib/**/*.js"]

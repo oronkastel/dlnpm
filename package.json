@@ -35,7 +35,8 @@
         "figlet": "^1.2.4",
         "node-fetch": "^2.6.0",
         "path": "^0.12.7",
-        "semver": "^7.1.1"
+        "semver": "^7.1.1",
+        "sync-request": "^6.1.0"
     },
     "repository": {
         "type": "git",
@@ -44,9 +45,7 @@
     "bin": {
         "dlnpm": "lib/index.js"
     },
-    "configurations": [
-        {
-            "type": "node"
-        }
-    ]
+    "configurations": [{
+        "type": "node"
+    }]
 }
