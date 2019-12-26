@@ -1,15 +1,21 @@
 #!/usr/bin/env node
 
+import { url } from "inspector";
+
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
 const path = require('path');
 const program = require('commander');
-const nodefetch = require('node-fetch');
+//const nodefetch = require('node-fetch');
 const request = require("sync-request");
 const semver = require('semver');
+const axios = require('axios');
+const fs = require('fs');
 
 const LATEST = 'latest';
+const nodeRegUrl = 'https://registry.npmjs.org/';
+const dlRoot = './DL_node_modules/';
 
 //Writing banner to console
 clear();
@@ -64,7 +70,7 @@ else{
 //  ***********
 function getPackageInfo(packageName: string, _packageVersion: string) {
     
-    let url = "https://registry.npmjs.org/" + packageName;
+    let url = nodeRegUrl + packageName;
 
     
     var tryJson = jsonCache[packageName];
@@ -79,20 +85,17 @@ function getPackageInfo(packageName: string, _packageVersion: string) {
         if(program.log) { console.log("GET: " + url) };
 
         var response = request('GET', url);
-        var body = response.getBody();
-        var json = JSON.parse(body);
 
+        if(response.statusCode===200) {
+            var body = response.getBody();
+            var json = JSON.parse(body);
+    
+            if(program.log) { console.log("GOT RESPONSE:" + url) };
 
-        if(program.log) { console.log("GOT RESPONSE:" + url) };
-
-        //check if we got a valid response
-        if(json['error']!==undefined) {
-            console.log(chalk.red('Err! URL %s returned an error: %s'),url,json['error']);
-        }
-        else
-        {      
             jsonCache[packageName] = json; //save the json in a cache in order not to pull from url in case we need to get this package info again.
             handlePackageJson(_packageVersion, json);
+        } else {
+            console.log(chalk.red('Err! URL %s returned an error code: %s'),url,response.statusCode);
         }
 
 /*
@@ -155,6 +158,7 @@ function handlePackageJson(_packageVersion: string, json: any) {
     if(versionInfo===undefined)
     {
         console.log(chalk.red("wasn't able to parse package version %s"),packageVersion)
+        return;
     }
     var versionSymbol = json.name + "@" + versionInfo.version;
     if (handledPackages[versionSymbol] === undefined) { //if we already processed this package@version
@@ -227,6 +231,37 @@ function HandleDependencies(dependencies: any) {
 
 
 function DownloadPack(pack: string) {
-    console.log(pack);
+    if (program.log) { console.log("downloading from %s",pack) };
+    var dlLocation = pack.replace(nodeRegUrl,"");
+    
+    var pathParse = path.parse(dlRoot + dlLocation);
+    var saveFolder = pathParse.dir;
+    var saveFile = pathParse.base;
+
+    //create the folder for the pack
+    if(!fs.existsSync(saveFolder)) {
+        fs.mkdirSync(saveFolder, { recursive: true })
+    }
+
+    DownloadFile(pack,saveFolder,saveFile);
+}
+
+async function DownloadFile(url: string, whereToSave: string, fileName: string) {
+
+    const dlpath = path.resolve(whereToSave,fileName);
+    const writer = fs.createWriteStream(dlpath);
+    const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'stream'
+    });
+
+    response.data.pipe(writer);
+  
+
+    /*return new Promise((resolve, reject) => {
+        writer.on('finish', resolve)
+        writer.on('error', reject)
+      })*/
 }
  

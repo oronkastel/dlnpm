@@ -6,7 +6,7 @@
         "request": "launch",
         "name": "Build Program",
         "program": "${workspaceFolder}\\lib\\index.js",
-        "args": [ "-p","debug"],
+        "args": [ "-p","colors"],
         //"preLaunchTask": "npm: build",
         "sourceMaps": true,
         "smartStep": true,
