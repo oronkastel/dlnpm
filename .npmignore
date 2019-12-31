@@ -2,3 +2,6 @@ README.md
 jest.config.json
 test/
 launch.json
+todo.txt
+log.txt
+test.ts

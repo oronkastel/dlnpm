@@ -1,6 +1,6 @@
 {
     "name": "dlnpm",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Download npm packages as .tgz files in order to be used in private npm repository",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -36,7 +36,8 @@
         "path": "^0.12.7",
         "semver": "^7.1.1",
         "sync-request": "^6.1.0",
-        "axios": "0.19.0"
+        "axios": "0.19.0",
+        "async": "3.1.0"
     },
     "repository": {
         "type": "git",
@@ -45,9 +46,7 @@
     "bin": {
         "dlnpm": "lib/index.js"
     },
-    "configurations": [
-        {
-            "type": "node"
-        }
-    ]
+    "configurations": [{
+        "type": "node"
+    }]
 }

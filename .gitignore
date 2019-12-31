@@ -4,3 +4,5 @@ dist
 lib
 *.tgz
 log.txt
+todo.txt
+test.ts

@@ -12,6 +12,8 @@ const request = require("sync-request");
 const semver = require('semver');
 const axios = require('axios');
 const fs = require('fs');
+const http = require('https');
+const async = require('async');
 
 const LATEST = 'latest';
 const nodeRegUrl = 'https://registry.npmjs.org/';
@@ -27,7 +29,7 @@ console.log(
 );
 
 //Defining cli parameters
-program.version('0.0.1')
+program.version('0.0.2')
         .description('Download npm packages as .tgz files in order to be used in private npm repository.')
         .option('-p, --package <value>', 'node module package to download.')
         .option('-v, --ver <value>', 'the version of the node module specified. Default: Latest.')
@@ -57,6 +59,8 @@ else{
     var erroredPackages: { [id: string] : number; } = {};
     var jsonCache: { [id: string]: any; } = {};
 
+    var dpq = async.queue(DownloadPack,2);
+    var hdq = async.queue(HandleDependencies,2);
 
     getPackageInfo(program.package,versionToDownload);
 
@@ -168,7 +172,7 @@ function handlePackageJson(_packageVersion: string, json: any) {
 
 
         handledPackages[versionSymbol] = versionSymbol;
-        DownloadPack(versionInfo.dist.tarball);
+        DownloadPack(versionInfo.dist.tarball)
 
         //Handle package depedencies
         HandleDependencies(versionInfo.dependencies);
@@ -243,8 +247,11 @@ function DownloadPack(pack: string) {
         fs.mkdirSync(saveFolder, { recursive: true })
     }
 
-    DownloadFile(pack,saveFolder,saveFile);
+    //DownloadFile(pack,saveFolder,saveFile);
+    const dlpath = path.resolve(saveFolder,saveFile);
+    require('child_process').execSync('curl ' + pack + ' --output ' + dlpath);
 }
+
 
 async function DownloadFile(url: string, whereToSave: string, fileName: string) {
 
@@ -259,9 +266,38 @@ async function DownloadFile(url: string, whereToSave: string, fileName: string) 
     response.data.pipe(writer);
   
 
-    /*return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         writer.on('finish', resolve)
         writer.on('error', reject)
-      })*/
+      })
 }
- 
+
+/*
+function DownloadPack2(pack: string) {
+    if (program.log) { console.log("downloading from %s",pack) };
+    var dlLocation = pack.replace(nodeRegUrl,"");
+    
+    var pathParse = path.parse(dlRoot + dlLocation);
+    var saveFolder = pathParse.dir;
+    var saveFile = pathParse.base;
+
+    //create the folder for the pack
+    if(!fs.existsSync(saveFolder)) {
+        fs.mkdirSync(saveFolder, { recursive: true })
+    }
+
+    DownloadFile2(pack,saveFolder,saveFile);
+}
+
+function DownloadFile2(url: string, whereToSave: string, fileName: string) {
+    const dlpath = path.resolve(whereToSave,fileName); 
+    var file = fs.createWriteStream(dlpath);
+    var request = http.get(url, function(response) {
+        response.pipe(file);
+        file.on('finish', function() {
+          file.close();
+          //cb();
+        });
+      });
+}
+ */
