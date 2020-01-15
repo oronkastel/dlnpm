@@ -13,7 +13,7 @@ const semver = require('semver');
 const axios = require('axios');
 const fs = require('fs');
 const http = require('https');
-const async = require('async');
+//const async = require('async');
 
 const LATEST = 'latest';
 const nodeRegUrl = 'https://registry.npmjs.org/';
@@ -29,7 +29,7 @@ console.log(
 );
 
 //Defining cli parameters
-program.version('0.0.2')
+program.version('0.0.4')
         .description('Download npm packages as .tgz files in order to be used in private npm repository.')
         .option('-p, --package <value>', 'node module package to download.')
         .option('-v, --ver <value>', 'the version of the node module specified. Default: Latest.')
@@ -56,13 +56,39 @@ else{
 
 
     var handledPackages: { [id: string] : string; } = {};
+
+    var ignorePackages:  { [id: string] : string; } = {};
+
     var erroredPackages: { [id: string] : number; } = {};
     var jsonCache: { [id: string]: any; } = {};
 
-    var dpq = async.queue(DownloadPack,2);
-    var hdq = async.queue(HandleDependencies,2);
+ //   var dpq = async.queue(DownloadPack,2);
+ //   var hdq = async.queue(HandleDependencies,2);
+
+
+    if(program.ignore) {
+        const LineReaderSync = require("line-reader-sync");
+        var lrs = new LineReaderSync(program.ignore);
+        var eof = false;
+        while(!eof)
+        {
+            var line = lrs.readline()
+            if(line === null)
+            {
+                eof = true;
+            }
+            else
+            {
+                line = line.replace(/\r?\n|\r/g, "");
+                ignorePackages[line] = line
+            }
+        }
+        //var ignoreContent = fs.readFileSync(program.ignore)
+    }
+
 
     getPackageInfo(program.package,versionToDownload);
+
 
     console.log(chalk.green('Finished Downloading ' + program.package + '@' + versionToDownload + ' and its dependencies...'));
 
@@ -165,11 +191,15 @@ function handlePackageJson(_packageVersion: string, json: any) {
         return;
     }
     var versionSymbol = json.name + "@" + versionInfo.version;
-    if (handledPackages[versionSymbol] === undefined) { //if we already processed this package@version
+    var checkIgnoreSymbol = json.name + "-" + versionInfo.version
+    if (handledPackages[versionSymbol] === undefined && ignorePackages[checkIgnoreSymbol] === undefined) { //if we already processed this package@version or packge-version is in ignore list
         if (program.log) {
             console.log('processing %s@%s... getting version %s', json.name, _packageVersion, versionInfo.version);
         }
 
+        if(program.ignore) {
+            fs.appendFileSync(path.join('.','DL.txt'),checkIgnoreSymbol + '\n');
+        }
 
         handledPackages[versionSymbol] = versionSymbol;
         DownloadPack(versionInfo.dist.tarball)

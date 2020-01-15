@@ -6,7 +6,7 @@
         "request": "launch",
         "name": "Build Program",
         "program": "${workspaceFolder}\\lib\\index.js",
-        "args": [ "-p","colors"],
+        "args": [ "-p","colors","-i","C:\\oron\\dlnpm\\lib\\ignore.txt"],
         //"preLaunchTask": "npm: build",
         "sourceMaps": true,
         "smartStep": true,
